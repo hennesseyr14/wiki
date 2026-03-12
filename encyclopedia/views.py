@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.shortcuts import render
+from markdown2 import markdown
 
 from . import util
 
@@ -17,5 +18,5 @@ def wiki(request, title):
 
     return render(request, "encyclopedia/wiki.html", {
         "title": title,
-        "entry": entry
+        "entry": markdown(entry)
     })
