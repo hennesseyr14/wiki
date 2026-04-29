@@ -1,5 +1,6 @@
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from markdown2 import markdown
 
 from . import util
@@ -19,4 +20,15 @@ def wiki(request, title):
     return render(request, "encyclopedia/wiki.html", {
         "title": title,
         "entry": markdown(entry)
+    })
+
+def search(request):
+    query = request.POST.get("q")
+    entry = util.get_entry(query)
+
+    if entry:
+        return HttpResponseRedirect(reverse("wiki", kwargs={"title": query}))
+
+    return render(request, "encyclopedia/search.html", {
+        "results": None,
     })
