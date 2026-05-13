@@ -1,3 +1,5 @@
+from django import forms
+from django.contrib import messages
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -24,6 +26,7 @@ def wiki(request, title):
         "entry": markdown(entry)
     })
 
+
 def search(request):
     query = request.POST.get("q")
 
@@ -35,6 +38,41 @@ def search(request):
         "header": f"Results for \"{query}\"",
         "entries": results,
     })
+
+
+class NewPageForm(forms.Form):
+    title = forms.CharField(label="Title")
+    content = forms.CharField(label="Content", widget=forms.Textarea)
+
+def create(request):
+    if request.method == "POST":
+        # Get submitted data from form
+        form = NewPageForm(request.POST)
+
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+
+            # If the entry does not already exist, save it to disk and redirect to the new page's entry
+            if not util.get_entry(title):
+                util.save_entry(title, content)
+                return HttpResponseRedirect(reverse("wiki", kwargs={"title": title}))
+
+            # Otherwise, display an error message and redirect back to the list of entries
+            else:
+                messages.error(request, f"Entry '{title}' already exists!")
+                return HttpResponseRedirect(reverse("index"))
+
+        else:
+            # Re-render page with existing information
+            return render(request, "encyclopedia/create.html", {
+                "form": form
+            })
+
+    return render(request, "encyclopedia/create.html", {
+        "form": NewPageForm(),
+    })
+
 
 def random(request):
     title = choice(util.list_entries())
