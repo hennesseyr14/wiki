@@ -2,6 +2,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from markdown2 import markdown
+from random import choice
 
 from . import util
 
@@ -33,4 +34,11 @@ def search(request):
     return render(request, "encyclopedia/index.html", {
         "header": f"Results for \"{query}\"",
         "entries": results,
+    })
+
+def random(request):
+    title = choice(util.list_entries())
+    return render(request, "encyclopedia/wiki.html", {
+        "title": title,
+        "entry": markdown(util.get_entry(title))
     })
