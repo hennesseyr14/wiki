@@ -8,6 +8,7 @@ from . import util
 
 def index(request):
     return render(request, "encyclopedia/index.html", {
+        "header": "All Pages",
         "entries": util.list_entries()
     })
 
@@ -24,11 +25,12 @@ def wiki(request, title):
 
 def search(request):
     query = request.POST.get("q")
-    entry = util.get_entry(query)
 
-    if entry:
+    if util.get_entry(query):
         return HttpResponseRedirect(reverse("wiki", kwargs={"title": query}))
 
-    return render(request, "encyclopedia/search.html", {
-        "results": None,
+    results = [entry for entry in util.list_entries() if query.lower() in entry.lower()]
+    return render(request, "encyclopedia/index.html", {
+        "header": f"Results for \"{query}\"",
+        "entries": results,
     })
