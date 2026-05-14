@@ -27,6 +27,33 @@ def wiki(request, title):
     })
 
 
+class EditPageForm(forms.Form):
+    content = forms.CharField(label="Content", widget=forms.Textarea)
+
+def edit(request, title):
+    if request.method == "POST":
+        # Get submitted data from form
+        form = EditPageForm(request.POST)
+
+        # Save the information, if valid
+        if form.is_valid():
+            content = form.cleaned_data["content"]
+
+            util.save_entry(title, content)
+            return HttpResponseRedirect(reverse("wiki", kwargs={"title": title}))
+
+        # Re-render page with existing information
+        return render(request, "encyclopedia/edit.html", {
+            "title": title,
+            "form": form
+        })
+
+    return render(request, "encyclopedia/edit.html", {
+        "title": title,
+        "form": EditPageForm(initial={"content": util.get_entry(title)}),
+    })
+
+
 def search(request):
     query = request.POST.get("q")
 
