@@ -59,9 +59,8 @@ def create(request):
                 return HttpResponseRedirect(reverse("wiki", kwargs={"title": title}))
 
             # Otherwise, display an error message and redirect back to the list of entries
-            else:
-                messages.error(request, f"Entry '{title}' already exists!")
-                return HttpResponseRedirect(reverse("index"))
+            messages.error(request, f"Entry '{title}' already exists!")
+            return HttpResponseRedirect(reverse("index"))
 
         else:
             # Re-render page with existing information
