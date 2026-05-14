@@ -62,11 +62,10 @@ def create(request):
             messages.error(request, f"Entry '{title}' already exists!")
             return HttpResponseRedirect(reverse("index"))
 
-        else:
-            # Re-render page with existing information
-            return render(request, "encyclopedia/create.html", {
-                "form": form
-            })
+        # Re-render page with existing information
+        return render(request, "encyclopedia/create.html", {
+            "form": form
+        })
 
     return render(request, "encyclopedia/create.html", {
         "form": NewPageForm(),
